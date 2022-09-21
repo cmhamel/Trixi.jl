@@ -294,6 +294,13 @@ include("linear_scalar_advection_1d.jl")
 include("linear_scalar_advection_2d.jl")
 include("linear_scalar_advection_3d.jl")
 
+# Linear vector advection
+abstract type AbstractLinearVectorAdvectionEquation{NDIMS, NVARS} <: AbstractEquations{NDIMS, NVARS} end
+include("linear_vector_advection_1d.jl")
+
+@inline ncomponents(::AbstractLinearVectorAdvectionEquation{NDIMS, NVARS}) where {NDIMS, NVARS} = NVARS
+
+
 # Inviscid Burgers
 abstract type AbstractInviscidBurgersEquation{NDIMS, NVARS} <: AbstractEquations{NDIMS, NVARS} end
 include("inviscid_burgers_1d.jl")
