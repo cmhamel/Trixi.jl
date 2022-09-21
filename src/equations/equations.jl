@@ -297,6 +297,7 @@ include("linear_scalar_advection_3d.jl")
 # Linear vector advection
 abstract type AbstractLinearVectorAdvectionEquation{NDIMS, NVARS} <: AbstractEquations{NDIMS, NVARS} end
 include("linear_vector_advection_1d.jl")
+include("linear_vector_advection_2d.jl")
 
 @inline ncomponents(::AbstractLinearVectorAdvectionEquation{NDIMS, NVARS}) where {NDIMS, NVARS} = NVARS
 
