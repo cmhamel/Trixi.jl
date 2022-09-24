@@ -5,7 +5,8 @@
 with diffusivity ``\kappa`` applied to each solution component defined by `equations`.
 """
 struct LaplaceDiffusion2D{E, N, T} <: AbstractLaplaceDiffusion{2, N}
-  diffusivity::T
+  #diffusivity::T
+  diffusivity::SVector{N, T}
   equations_hyperbolic::E
 end
 
@@ -19,9 +20,9 @@ varnames(variable_mapping, equations_parabolic::LaplaceDiffusion2D) =
 function flux(u, gradients, orientation::Integer, equations_parabolic::LaplaceDiffusion2D)
   dudx, dudy = gradients
   if orientation == 1
-    return SVector(equations_parabolic.diffusivity * dudx)
+    return SVector(equations_parabolic.diffusivity .* dudx)
   else # if orientation == 2
-    return SVector(equations_parabolic.diffusivity * dudy)
+    return SVector(equations_parabolic.diffusivity .* dudy)
   end
 end
 
@@ -29,7 +30,7 @@ end
 # The penalization depends on the solver, but also depends explicitly on physical parameters,
 # and would probably need to be specialized for every different equation.
 function penalty(u_outer, u_inner, inv_h, equations_parabolic::LaplaceDiffusion2D, dg::ViscousFormulationLocalDG)
-  return dg.penalty_parameter * (u_outer - u_inner) * equations_parabolic.diffusivity * inv_h
+  return dg.penalty_parameter * (u_outer - u_inner) .* equations_parabolic.diffusivity * inv_h
 end
 
 # Dirichlet-type boundary condition for use with a parabolic solver in weak form

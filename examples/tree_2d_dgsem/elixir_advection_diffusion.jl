@@ -6,7 +6,7 @@ using Trixi
 
 advection_velocity = (1.5, 1.0)
 equations = LinearScalarAdvectionEquation2D(advection_velocity)
-diffusivity() = 5.0e-2
+diffusivity() = SVector(5.0e-2)
 equations_parabolic = LaplaceDiffusion2D(diffusivity(), equations)
 
 # Create DG solver with polynomial degree = 3 and (local) Lax-Friedrichs/Rusanov flux as surface flux
@@ -32,7 +32,7 @@ function initial_condition_diffusive_convergence_test(x, t, equation::LinearScal
   L = 2
   f = 1/L
   omega = 2 * pi * f
-  scalar = c + A * sin(omega * sum(x_trans)) * exp(-2 * nu * omega^2 * t)
+  scalar = c .+ A * sin(omega * sum(x_trans)) * exp.(-2 * nu * omega^2 * t)
   return SVector(scalar)
 end
 initial_condition = initial_condition_diffusive_convergence_test

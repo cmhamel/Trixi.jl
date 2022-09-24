@@ -1,10 +1,11 @@
 using OrdinaryDiffEq
+using Plots
 using Trixi
 
 ###############################################################################
 # semidiscretization of the linear advection-diffusion equation
 
-diffusivity() = 5.0e-2
+diffusivity() = SVector(5.0e-2)
 advection_velocity = (1.0, 0.0)
 equations = LinearScalarAdvectionEquation2D(advection_velocity)
 equations_parabolic = LaplaceDiffusion2D(diffusivity(), equations)
@@ -29,7 +30,7 @@ mesh = TreeMesh(coordinates_min, coordinates_max,
 #   [DOI](https://doi.org/10.1007/978-3-319-41640-3_6).
 function initial_condition_erikkson_johnson(x, t, equations)
   l = 4
-  epsilon = diffusivity() # TODO: this requires epsilon < .6 due to sqrt
+  epsilon = diffusivity()[1] # TODO: this requires epsilon < .6 due to sqrt
   lambda_1 = (-1 + sqrt(1 - 4 * epsilon * l)) / (-2 * epsilon)
   lambda_2 = (-1 - sqrt(1 - 4 * epsilon * l)) / (-2 * epsilon)
   r1 = (1 + sqrt(1 + 4 * pi^2 * epsilon^2)) / (2 * epsilon)
@@ -72,6 +73,7 @@ analysis_callback = AnalysisCallback(semi, interval=analysis_interval)
 
 # The AliveCallback prints short status information in regular intervals
 alive_callback = AliveCallback(analysis_interval=analysis_interval)
+                                               
 
 # Create a CallbackSet to collect all callbacks such that they can be passed to the ODE solver
 callbacks = CallbackSet(summary_callback, analysis_callback, alive_callback)
