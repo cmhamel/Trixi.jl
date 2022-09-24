@@ -20,6 +20,22 @@ mesh = TreeMesh(coordinates_min, coordinates_max,
                 initial_refinement_level=4,
                 n_cells_max=30_000) # set maximum capacity of tree data structure
 
+function Trixi.initial_condition_convergence_test(x, t, equations::LinearVectorAdvectionEquation1D)
+    # Store translated coordinate for easy use of exact solution
+    x_trans = x - equations.advection_velocity * t
+    
+    # c = 1.0
+    c = SVector(1., 0.5, 2., 0.25)
+    # A = 0.5
+    A = SVector(1., 0.5, 2., 0.25)
+    L = 2
+    f = 1/L
+    omega = 2 * pi * f
+    Vector = c .+ A .* sin(omega * sum(x_trans))
+    # return SVector{ncomponents(equations)}(fill(Vector, ncomponents(equations)))
+    return SVector(Vector)
+end
+
 # A semidiscretization collects data structures and functions for the spatial discretization
 semi = SemidiscretizationHyperbolic(mesh, equations, initial_condition_convergence_test, solver)
 

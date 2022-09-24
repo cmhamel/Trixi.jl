@@ -5,7 +5,6 @@
 with diffusivity ``\kappa`` applied to each solution component defined by `equations`.
 """
 struct LaplaceDiffusion2D{E, N, T} <: AbstractLaplaceDiffusion{2, N}
-  #diffusivity::T
   diffusivity::SVector{N, T}
   equations_hyperbolic::E
 end

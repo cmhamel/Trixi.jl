@@ -48,176 +48,176 @@ end
 # end
 
 # Set initial conditions at physical location `x` for time `t`
-"""
-    initial_condition_constant(x, t, equations::LinearVectorAdvectionEquation2D)
+# """
+#     initial_condition_constant(x, t, equations::LinearVectorAdvectionEquation2D)
 
-A constant initial condition to test free-stream preservation.
-"""
-function initial_condition_constant(x, t, equations::LinearVectorAdvectionEquation2D)
-  # Store translated coordinate for easy use of exact solution
-  x_trans = x_trans_periodic_2d(x - equations.advection_velocity * t)
+# A constant initial condition to test free-stream preservation.
+# """
+# function initial_condition_constant(x, t, equations::LinearVectorAdvectionEquation2D)
+#   # Store translated coordinate for easy use of exact solution
+#   x_trans = x_trans_periodic_2d(x - equations.advection_velocity * t)
 
-  return SVector{ncomponents(equations)}(fill(2.0, ncomponents(equations)))
-end
-
-
-"""
-    initial_condition_convergence_test(x, t, equations::LinearVectorAdvectionEquation2D)
-
-A smooth initial condition used for convergence tests.
-"""
-function initial_condition_convergence_test(x, t, equations::LinearVectorAdvectionEquation2D)
-  # Store translated coordinate for easy use of exact solution
-  x_trans = x - equations.advection_velocity * t
-
-  c = 1.0
-  A = 0.5
-  L = 2
-  f = 1/L
-  omega = 2 * pi * f
-  Vector = c + A * sin(omega * sum(x_trans))
-  return SVector{ncomponents(equations)}(fill(Vector, ncomponents(equations)))
-end
+#   return SVector{ncomponents(equations)}(fill(2.0, ncomponents(equations)))
+# end
 
 
-"""
-    initial_condition_gauss(x, t, equations::LinearVectorAdvectionEquation2D)
+# """
+#     initial_condition_convergence_test(x, t, equations::LinearVectorAdvectionEquation2D)
 
-A Gaussian pulse used together with
-[`BoundaryConditionDirichlet(initial_condition_gauss)`](@ref).
-"""
-function initial_condition_gauss(x, t, equations::LinearVectorAdvectionEquation2D)
-  # Store translated coordinate for easy use of exact solution
-  x_trans = x_trans_periodic_2d(x - equations.advection_velocity * t)
+# A smooth initial condition used for convergence tests.
+# """
+# function initial_condition_convergence_test(x, t, equations::LinearVectorAdvectionEquation2D)
+#   # Store translated coordinate for easy use of exact solution
+#   x_trans = x - equations.advection_velocity * t
 
-  Vector = exp(-(x_trans[1]^2 + x_trans[2]^2))
-  return SVector{ncomponents(equations)}(fill(Vector, ncomponents(equations)))
-end
-
-
-"""
-    initial_condition_sin_sin(x, t, equations::LinearVectorAdvectionEquation2D)
-
-A sine wave in the conserved variable.
-"""
-function initial_condition_sin_sin(x, t, equations::LinearVectorAdvectionEquation2D)
-  # Store translated coordinate for easy use of exact solution
-  x_trans = x - equations.advection_velocity * t
-
-  Vector = sinpi(2 * x_trans[1]) * sinpi(2 * x_trans[2])
-  return SVector{ncomponents(equations)}(fill(Vector, ncomponents(equations)))
-end
+#   c = 1.0
+#   A = 0.5
+#   L = 2
+#   f = 1/L
+#   omega = 2 * pi * f
+#   Vector = c + A * sin(omega * sum(x_trans))
+#   return SVector{ncomponents(equations)}(fill(Vector, ncomponents(equations)))
+# end
 
 
-"""
-    initial_condition_linear_x_y(x, t, equations::LinearVectorAdvectionEquation2D)
+# """
+#     initial_condition_gauss(x, t, equations::LinearVectorAdvectionEquation2D)
 
-A linear function of `x[1] + x[2]` used together with
-[`boundary_condition_linear_x_y`](@ref).
-"""
-function initial_condition_linear_x_y(x, t, equations::LinearVectorAdvectionEquation2D)
-  # Store translated coordinate for easy use of exact solution
-  x_trans = x - equations.advection_velocity * t
+# A Gaussian pulse used together with
+# [`BoundaryConditionDirichlet(initial_condition_gauss)`](@ref).
+# """
+# function initial_condition_gauss(x, t, equations::LinearVectorAdvectionEquation2D)
+#   # Store translated coordinate for easy use of exact solution
+#   x_trans = x_trans_periodic_2d(x - equations.advection_velocity * t)
 
-  return SVector{ncomponents(equations)}(fill(sum(x_trans), ncomponents(equations)))
-end
-
-"""
-    boundary_condition_linear_x_y(u_inner, orientation, direction, x, t,
-                                  surface_flux_function,
-                                  equations::LinearVectorAdvectionEquation2D)
-
-Boundary conditions for
-[`initial_condition_linear_x_y`](@ref).
-"""
-function boundary_condition_linear_x_y(u_inner, orientation, direction, x, t,
-                                       surface_flux_function,
-                                       equations::LinearVectorAdvectionEquation2D)
-  u_boundary = initial_condition_linear_x_y(x, t, equations)
-
-  # Calculate boundary flux
-  if direction in (2, 4) # u_inner is "left" of boundary, u_boundary is "right" of boundary
-    flux = surface_flux_function(u_inner, u_boundary, orientation, equations)
-  else # u_boundary is "left" of boundary, u_inner is "right" of boundary
-    flux = surface_flux_function(u_boundary, u_inner, orientation, equations)
-  end
-
-  return flux
-end
+#   Vector = exp(-(x_trans[1]^2 + x_trans[2]^2))
+#   return SVector{ncomponents(equations)}(fill(Vector, ncomponents(equations)))
+# end
 
 
-"""
-    initial_condition_linear_x(x, t, equations::LinearVectorAdvectionEquation2D)
+# """
+#     initial_condition_sin_sin(x, t, equations::LinearVectorAdvectionEquation2D)
 
-A linear function of `x[1]` used together with
-[`boundary_condition_linear_x`](@ref).
-"""
-function initial_condition_linear_x(x, t, equations::LinearVectorAdvectionEquation2D)
-  # Store translated coordinate for easy use of exact solution
-  x_trans = x - equations.advection_velocity * t
+# A sine wave in the conserved variable.
+# """
+# function initial_condition_sin_sin(x, t, equations::LinearVectorAdvectionEquation2D)
+#   # Store translated coordinate for easy use of exact solution
+#   x_trans = x - equations.advection_velocity * t
 
-  return SVector{ncomponents(equations)}(fill(x_trans[1], ncomponents(equations)))
-end
-
-"""
-    boundary_condition_linear_x(u_inner, orientation, direction, x, t,
-                                surface_flux_function,
-                                equations::LinearVectorAdvectionEquation2D)
-
-Boundary conditions for
-[`initial_condition_linear_x`](@ref).
-"""
-function boundary_condition_linear_x(u_inner, orientation, direction, x, t,
-                                     surface_flux_function,
-                                     equations::LinearVectorAdvectionEquation2D)
-  u_boundary = initial_condition_linear_x(x, t, equations)
-
-  # Calculate boundary flux
-  if direction in (2, 4) # u_inner is "left" of boundary, u_boundary is "right" of boundary
-    flux = surface_flux_function(u_inner, u_boundary, orientation, equations)
-  else # u_boundary is "left" of boundary, u_inner is "right" of boundary
-    flux = surface_flux_function(u_boundary, u_inner, orientation, equations)
-  end
-
-  return flux
-end
+#   Vector = sinpi(2 * x_trans[1]) * sinpi(2 * x_trans[2])
+#   return SVector{ncomponents(equations)}(fill(Vector, ncomponents(equations)))
+# end
 
 
-"""
-    initial_condition_linear_y(x, t, equations::LinearVectorAdvectionEquation2D)
+# """
+#     initial_condition_linear_x_y(x, t, equations::LinearVectorAdvectionEquation2D)
 
-A linear function of `x[1]` used together with
-[`boundary_condition_linear_y`](@ref).
-"""
-function initial_condition_linear_y(x, t, equations::LinearVectorAdvectionEquation2D)
-  # Store translated coordinate for easy use of exact solution
-  x_trans = x - equations.advection_velocity * t
+# A linear function of `x[1] + x[2]` used together with
+# [`boundary_condition_linear_x_y`](@ref).
+# """
+# function initial_condition_linear_x_y(x, t, equations::LinearVectorAdvectionEquation2D)
+#   # Store translated coordinate for easy use of exact solution
+#   x_trans = x - equations.advection_velocity * t
 
-  return SVector{ncomponents(equations)}(fill(x_trans[2], ncomponents(equations)))
-end
+#   return SVector{ncomponents(equations)}(fill(sum(x_trans), ncomponents(equations)))
+# end
 
-"""
-    boundary_condition_linear_y(u_inner, orientation, direction, x, t,
-                                surface_flux_function,
-                                equations::LinearVectorAdvectionEquation2D)
+# """
+#     boundary_condition_linear_x_y(u_inner, orientation, direction, x, t,
+#                                   surface_flux_function,
+#                                   equations::LinearVectorAdvectionEquation2D)
 
-Boundary conditions for
-[`initial_condition_linear_y`](@ref).
-"""
-function boundary_condition_linear_y(u_inner, orientation, direction, x, t,
-                                     surface_flux_function,
-                                     equations::LinearVectorAdvectionEquation2D)
-  u_boundary = initial_condition_linear_y(x, t, equations)
+# Boundary conditions for
+# [`initial_condition_linear_x_y`](@ref).
+# """
+# function boundary_condition_linear_x_y(u_inner, orientation, direction, x, t,
+#                                        surface_flux_function,
+#                                        equations::LinearVectorAdvectionEquation2D)
+#   u_boundary = initial_condition_linear_x_y(x, t, equations)
 
-  # Calculate boundary flux
-  if direction in (2, 4) # u_inner is "left" of boundary, u_boundary is "right" of boundary
-    flux = surface_flux_function(u_inner, u_boundary, orientation, equations)
-  else # u_boundary is "left" of boundary, u_inner is "right" of boundary
-    flux = surface_flux_function(u_boundary, u_inner, orientation, equations)
-  end
+#   # Calculate boundary flux
+#   if direction in (2, 4) # u_inner is "left" of boundary, u_boundary is "right" of boundary
+#     flux = surface_flux_function(u_inner, u_boundary, orientation, equations)
+#   else # u_boundary is "left" of boundary, u_inner is "right" of boundary
+#     flux = surface_flux_function(u_boundary, u_inner, orientation, equations)
+#   end
 
-  return flux
-end
+#   return flux
+# end
+
+
+# """
+#     initial_condition_linear_x(x, t, equations::LinearVectorAdvectionEquation2D)
+
+# A linear function of `x[1]` used together with
+# [`boundary_condition_linear_x`](@ref).
+# """
+# function initial_condition_linear_x(x, t, equations::LinearVectorAdvectionEquation2D)
+#   # Store translated coordinate for easy use of exact solution
+#   x_trans = x - equations.advection_velocity * t
+
+#   return SVector{ncomponents(equations)}(fill(x_trans[1], ncomponents(equations)))
+# end
+
+# """
+#     boundary_condition_linear_x(u_inner, orientation, direction, x, t,
+#                                 surface_flux_function,
+#                                 equations::LinearVectorAdvectionEquation2D)
+
+# Boundary conditions for
+# [`initial_condition_linear_x`](@ref).
+# """
+# function boundary_condition_linear_x(u_inner, orientation, direction, x, t,
+#                                      surface_flux_function,
+#                                      equations::LinearVectorAdvectionEquation2D)
+#   u_boundary = initial_condition_linear_x(x, t, equations)
+
+#   # Calculate boundary flux
+#   if direction in (2, 4) # u_inner is "left" of boundary, u_boundary is "right" of boundary
+#     flux = surface_flux_function(u_inner, u_boundary, orientation, equations)
+#   else # u_boundary is "left" of boundary, u_inner is "right" of boundary
+#     flux = surface_flux_function(u_boundary, u_inner, orientation, equations)
+#   end
+
+#   return flux
+# end
+
+
+# """
+#     initial_condition_linear_y(x, t, equations::LinearVectorAdvectionEquation2D)
+
+# A linear function of `x[1]` used together with
+# [`boundary_condition_linear_y`](@ref).
+# """
+# function initial_condition_linear_y(x, t, equations::LinearVectorAdvectionEquation2D)
+#   # Store translated coordinate for easy use of exact solution
+#   x_trans = x - equations.advection_velocity * t
+
+#   return SVector{ncomponents(equations)}(fill(x_trans[2], ncomponents(equations)))
+# end
+
+# """
+#     boundary_condition_linear_y(u_inner, orientation, direction, x, t,
+#                                 surface_flux_function,
+#                                 equations::LinearVectorAdvectionEquation2D)
+
+# Boundary conditions for
+# [`initial_condition_linear_y`](@ref).
+# """
+# function boundary_condition_linear_y(u_inner, orientation, direction, x, t,
+#                                      surface_flux_function,
+#                                      equations::LinearVectorAdvectionEquation2D)
+#   u_boundary = initial_condition_linear_y(x, t, equations)
+
+#   # Calculate boundary flux
+#   if direction in (2, 4) # u_inner is "left" of boundary, u_boundary is "right" of boundary
+#     flux = surface_flux_function(u_inner, u_boundary, orientation, equations)
+#   else # u_boundary is "left" of boundary, u_inner is "right" of boundary
+#     flux = surface_flux_function(u_boundary, u_inner, orientation, equations)
+#   end
+
+#   return flux
+# end
 
 
 # Pre-defined source terms should be implemented as
