@@ -7,7 +7,10 @@ using Trixi
 # semidiscretization of the linear advection equation
 
 advection_velocity = (0.2, -0.7)
+# advection_velocity = SVector{2, Float64}([0.2, -0.7])
+
 equations = LinearVectorAdvectionEquation2D(advection_velocity, 2)
+# equations = LinearVectorAdvectionEquation2D(0.2, -0.7, 2)
 
 # Create DG solver with polynomial degree = 3 and (local) Lax-Friedrichs/Rusanov flux as surface flux
 solver = DGSEM(polydeg=3, surface_flux=flux_lax_friedrichs)
@@ -57,10 +60,8 @@ save_solution = SaveSolutionCallback(interval=100,
 # The StepsizeCallback handles the re-calculcation of the maximum Δt after each time step
 stepsize_callback = StepsizeCallback(cfl=1.6)
 
-visualization_callback = VisualizationCallback(interval=1, plot_data_creator=PlotData2D)
-
 # Create a CallbackSet to collect all callbacks such that they can be passed to the ODE solver
-callbacks = CallbackSet(summary_callback, analysis_callback, save_solution, stepsize_callback, visualization_callback)
+callbacks = CallbackSet(summary_callback, analysis_callback, save_solution, stepsize_callback)
 
 
 ###############################################################################

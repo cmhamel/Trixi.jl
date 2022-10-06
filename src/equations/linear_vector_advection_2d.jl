@@ -22,7 +22,7 @@ struct LinearVectorAdvectionEquation2D{NVARS, RealT<:Real} <: AbstractLinearVect
 end
 
 function LinearVectorAdvectionEquation2D(a::NTuple{2,RealT}, nvars::Integer) where {RealT <: Real}
-  LinearVectorAdvectionEquation2D{nvars,RealT}(SVector(a))
+  LinearVectorAdvectionEquation2D{nvars,RealT}(SVector(a[1], a[2]))
 end
 
 function LinearVectorAdvectionEquation2D(a1::RealT, a2::RealT, nvars::Integer) where {RealT <: Real}
